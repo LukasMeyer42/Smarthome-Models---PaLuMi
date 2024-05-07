@@ -5,7 +5,7 @@
 #include <ESP32Servo.h>
 
 // Replace with your network credentials
-const char* ssid = "";
+const char* ssid = "SensorNet";
 const char* password = ""; // Füge dein WLAN-Passwort hier ein
 
 // Replace with your MQTT broker details
@@ -20,7 +20,7 @@ const char* mqtt_topic_schloss = "esp32/output";
 #define DHTTYPE DHT11
 #define GASPIN A12
 
-static const int servoPin = 17;
+static const int servoPin = 32;
 Servo myservo; 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -135,11 +135,13 @@ void loop() {
     Serial.println("Schloss wird geschlossen AUTO ");
   }
 
-  // Publish sensor data to MQTT topics
-  client.publish(mqtt_topic_temperature, String(temperature).c_str(), true);
-  client.publish(mqtt_topic_humidity, String(humidity).c_str(), true);
-  client.publish(mqtt_topic_gas, String(sensorValue).c_str(), true);
+  if (!isnan(temperature) && !isnan(humidity) && !isnan(sensorValue)) {
+    // Publish sensor data to MQTT topics
+    client.publish(mqtt_topic_temperature, String(temperature).c_str(), true);
+    client.publish(mqtt_topic_humidity, String(humidity).c_str(), true);
+    client.publish(mqtt_topic_gas, String(sensorValue).c_str(), true);
 
+  }
   // Sende Daten alle 2 Sekunden
   delay(2000);
 }
